@@ -8,4 +8,4 @@ name = "mpv_rpc"
 crate-type = ["cdylib"]
 
 [dependencies]
-mpv-client = "0.4.0"
+mpv-client = { git = "https://github.com/ryze312/mpv-client", branch = "bool_format"}
