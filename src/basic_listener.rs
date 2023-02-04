@@ -1,46 +1,61 @@
+use std::rc::Rc;
 use crate::mpv_event_handler::events::{MpvEvent, Listener, FileInfo};
+use crate::logging::{self, Logger};
 
-pub struct MpvListener;
+pub struct MpvListener {
+    logger: Rc<Logger>
+}
 
 impl MpvListener {
-    fn print_file_info(&self, file_info: FileInfo) {
+    pub fn new(logger: Rc<Logger>) -> Self {
+        Self {
+            logger
+        }
+    }
+
+
+    fn print_file_info(&self, file_info: FileInfo) -> Result<(), &'static str> {
         let FileInfo {filename, metadata} = file_info;
 
-        println!("[RPC] FILENAME: {filename}");
+        logging::info!(self.logger, "FILENAME {}", filename);
         
         if let Some(artist) = metadata.artist {
-            println!("[RPC] ARTIST: {artist}");
+            logging::info!(self.logger, "ARTIST: {artist}");
         }
 
         if let Some(album) = metadata.album {
-            println!("[RPC] ALBUM: {album}");
+            logging::info!(self.logger, "ALBUM: {album}");
         }
 
         if let Some(title) = metadata.title {
-            println!("[RPC] TITLE: {title}");
+            logging::info!(self.logger, "TITLE: {title}");
         }
 
         if let Some(track) = metadata.track {
-            println!("[RPC] TRACK: {track}");
+            logging::info!(self.logger, "TRACK: {track}");
         }
+        Ok(())
     }
 
-    fn print_seek_time(&self, time: i64) {
-        println!("[RPC] SEEKING: {time}");
+    fn print_seek_time(&self, time: i64) -> Result<(),  &'static str>{
+        logging::info!(self.logger, "SEEKING: {time}");
+        Ok(())
     }
 
-    fn print_play(&self) {
-        println!("[RPC] PLAY");
+    fn print_play(&self) -> Result<(),  &'static str> {
+        logging::info!(self.logger, "PLAY");
+        Ok(())
     }
 
-    fn print_pause(&self) {
-        println!("[RPC] PAUSE");
+    fn print_pause(&self) -> Result<(),  &'static str> {
+        logging::info!(self.logger, "PAUSE");
+        Ok(())
     }
 }
 
 
 impl Listener for MpvListener {
-    fn handle_event(&self, event: MpvEvent) {
+    fn handle_event(&self, event: MpvEvent) -> Result<(), &'static str>{
         match event {
             MpvEvent::FileLoaded(file_info) => self.print_file_info(file_info),
             MpvEvent::Seek(time) => self.print_seek_time(time),

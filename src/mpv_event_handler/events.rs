@@ -18,5 +18,5 @@ pub enum MpvEvent {
 }
 
 pub trait Listener {
-    fn handle_event(&self, event: MpvEvent);
+    fn handle_event(&self, event: MpvEvent) -> Result<(), &'static str>;
 }
