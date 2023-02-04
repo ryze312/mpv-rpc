@@ -1,0 +1,11 @@
+[package]
+name = "mpv-rpc"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "mpv_rpc"
+crate-type = ["cdylib"]
+
+[dependencies]
+mpv-client = "0.4.0"
