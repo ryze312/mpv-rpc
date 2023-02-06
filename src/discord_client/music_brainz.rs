@@ -1,24 +1,28 @@
-use musicbrainz_rs::entity::release::{Release, ReleaseSearchQuery};
+use musicbrainz_rs::entity::release_group::{ReleaseGroup, ReleaseGroupSearchQuery};
 use musicbrainz_rs::entity::CoverartResponse;
 use musicbrainz_rs::{Search, FetchCoverart};
 
 pub fn get_cover_art_url(title: &Option<String>, album: &Option<String>, artist: &Option<String>) -> Option<String>{
-    let mut builder = ReleaseSearchQuery::query_builder();
+    let mut builder = ReleaseGroupSearchQuery::query_builder();
     if let Some(ref title) = title {
-        builder.release(title);
+        builder.release_group(title);
     }
 
     if let Some(ref album) = album {
-        builder.or().release(album);
+        builder.or().release_group(album);
     }
 
     if let Some(ref artist) = artist {
-        builder.and().artist(artist);
+        // Some artist fields might contain + characters
+        // Pointing at multiple artists
+        for part in artist.split("+") {
+            builder.and().artist(part);
+        }
     }
-    
+
     let query = builder.build();
     
-    let result = match Release::search(query).execute() {
+    let result = match ReleaseGroup::search(query).execute() {
         Ok(res) => res,
         Err(_) => return None
     };
