@@ -1,9 +1,9 @@
-use std::rc::Rc;
+use std::{rc::Rc, time::Duration};
 use mpv_client::{Handle, Event, Property, Format, mpv_handle, ClientMessage};
 use crate::logging::{self, Logger};
 
 pub mod events;
-use events::{MpvEvent, FileInfo, FileMetadata};
+use events::{MpvEvent, MpvRequest, FileInfo, FileMetadata};
 
 
 const NAME_PAUSE_PROP: &str = "pause";
@@ -11,7 +11,7 @@ const REPL_PAUSE_PROP: u64 = 1;
 
 pub struct MpvEventQueue {
     mpv: Handle,
-    logger: Rc<Logger>,
+    logger: Rc<Logger>
 }
 
 impl MpvEventQueue {
@@ -40,18 +40,31 @@ impl MpvEventQueue {
         }
     }
 
-    pub fn next_event(&self) -> Option<MpvEvent> {
+    pub fn next_event(&mut self) -> Option<MpvEvent> {
         let event = self.mpv.wait_event(0.0);
         let mpv_event = self.convert_event(event);
-        
-        if let Some(ref event) = mpv_event {
-            logging::info!(self.logger, "Event: {event}");
-        }
-
         mpv_event
     }
 
+    pub fn handle_request(&self, request: MpvRequest) -> Result<(), &'static str> {
+        match request {
+            MpvRequest::OSDMessage(message) => self.display_osd_message(message)
+        }
+    }
+    
+    pub fn display_osd_message(&self, message: &str) -> Result<(), &'static str> {
+        match self.mpv.osd_message(message, Duration::from_secs(1)) {
+            Ok(()) => Ok(()),
+            Err(_) => Err("cannot print OSD message")
+        }
+    }
+
     fn convert_event(&self, event: Event) -> Option<MpvEvent> {
+        match event {
+            Event::None => (),
+            ref event => logging::info!(self.logger, "Event: {event}")
+        }
+
         match event {
             Event::FileLoaded => self.get_file_info_event(),
             Event::PlaybackRestart => self.get_seek_event(),
@@ -87,27 +100,33 @@ impl MpvEventQueue {
     fn get_property_event(&self, prop_id: u64, prop: Property) -> Option<MpvEvent> {
         logging::info!(self.logger, "Property changed: {prop_id}");
         match prop_id {
-            1 => Some(self.convert_pause_prop(prop.data().unwrap())),
+            1 => self.convert_pause_prop(prop.data().unwrap()),
+            2 => self.convert_buffering_prop(prop.data().unwrap()),
             _ => None
         }
     }
 
-    fn convert_pause_prop(&self, pause: bool) -> MpvEvent {
+    fn convert_pause_prop(&self, pause: bool) -> Option<MpvEvent> {
+        let time = self.get_remaining_time();
         match pause {
-            false => MpvEvent::Play,
-            true => MpvEvent::Pause
+            false => Some(MpvEvent::Play(time)),
+            true => Some(MpvEvent::Pause(time))
+        }
+    }
+
+    pub fn convert_buffering_prop(&self, buffering: bool) -> Option<MpvEvent> {
+        match buffering {
+            true => Some(MpvEvent::Buffering),
+            false => None
         }
     }
 
     fn get_seek_event(&self) -> Option<MpvEvent> {
-        let remaining_time = self.mpv.get_property("time-remaining").unwrap_or_else(|_| {
-            logging::warning!(self.logger, "Failed retrieving remaing-time.");
-            logging::warning!(self.logger, "This usually happens seeking into file end. Possibly mpv bug?");
-            logging::warning!(self.logger, "Defaulting to 0.");
-            0
-        });
+        Some(MpvEvent::Seek(self.get_remaining_time()))
+    }
 
-        Some(MpvEvent::Seek(remaining_time))
+    fn get_remaining_time(&self) -> i64 {
+        self.mpv.get_property("time-remaining").unwrap_or_default()
     }
 
     fn get_toggle_event(&self, message: ClientMessage) -> Option<MpvEvent> {
@@ -115,10 +134,11 @@ impl MpvEventQueue {
         logging::info!(self.logger, "Client message: {command}");
         
         if command.starts_with("key-binding toggle-rpc d-") {
-            return Some(MpvEvent::Toggle)
+            Some(MpvEvent::Toggle)
         }
         else {
             None
         }
     }
+
 }

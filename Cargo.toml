@@ -10,6 +10,9 @@ crate-type = ["cdylib"]
 [dependencies]
 mpv-client = "0.4.1"
 discord-rich-presence="0.2.3"
+serde = { version = "1.0.152", features = ["derive"] }
+serde_json = "1.0.92"
+musicbrainz_rs = { version = "0.5.0", default-features = false, features = ["blocking"] }
 
 [profile.release-full]
 inherits = "release"

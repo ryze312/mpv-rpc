@@ -19,11 +19,10 @@ impl From<u32> for LogLevel {
             1 => LogLevel::Error,
             2 => LogLevel::Warn,
             3 => LogLevel::Info,
-            _ => LogLevel::Error
+            _ => LogLevel::Info
         }
     }
 }
-
 
 #[allow(dead_code)]
 pub struct Logger {
@@ -65,5 +64,4 @@ impl Logger {
             println!("[mpv-rpc (ERROR)] {}", message);
         }
     }
-
 }
