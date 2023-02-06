@@ -1,0 +1,124 @@
+use std::rc::Rc;
+use mpv_client::{Handle, Event, Property, Format, mpv_handle, ClientMessage};
+use crate::logging::{self, Logger};
+
+pub mod events;
+use events::{MpvEvent, FileInfo, FileMetadata};
+
+
+const NAME_PAUSE_PROP: &str = "pause";
+const REPL_PAUSE_PROP: u64 = 1;
+
+pub struct MpvEventQueue {
+    mpv: Handle,
+    logger: Rc<Logger>,
+}
+
+impl MpvEventQueue {
+    pub fn new(mpv: Handle,logger: Rc<Logger>) -> Result<Self, &'static str>  {        
+        let new_self = Self {
+            mpv,
+            logger,
+        };
+        
+        new_self.initialize()?;        
+        Ok(new_self)
+    }
+
+    pub fn from_ptr<'a>(handle: *mut mpv_handle, logger: Rc<Logger>) -> Result<Self, &'static str> {
+        MpvEventQueue::new(Handle::from_ptr(handle), logger)
+    }
+
+    fn initialize(&self) -> Result<(), &'static str> {
+        self.observe_property(REPL_PAUSE_PROP, NAME_PAUSE_PROP, bool::MPV_FORMAT)
+    }
+
+    fn observe_property(&self, id: u64, name: &str, format: i32) -> Result<(), &'static str> {
+        match self.mpv.observe_property(id, name, format) {
+            Ok(_) => Ok(()),
+            Err(_) => Err("cannot observe property")
+        }
+    }
+
+    pub fn next_event(&self) -> Option<MpvEvent> {
+        let event = self.mpv.wait_event(0.0);
+        let mpv_event = self.convert_event(event);
+        
+        if let Some(ref event) = mpv_event {
+            logging::info!(self.logger, "Event: {event}");
+        }
+
+        mpv_event
+    }
+
+    fn convert_event(&self, event: Event) -> Option<MpvEvent> {
+        match event {
+            Event::FileLoaded => self.get_file_info_event(),
+            Event::PlaybackRestart => self.get_seek_event(),
+            Event::ClientMessage(message) => self.get_toggle_event(message),
+            Event::PropertyChange(prop_id, prop) => self.get_property_event(prop_id, prop),
+            Event::Shutdown => Some(MpvEvent::Exit),
+            _ => None
+        }
+    }
+
+    fn get_file_info_event(&self) -> Option<MpvEvent> {
+        let filename = self.mpv.get_property("filename").unwrap();
+        let artist = self.mpv.get_property("metadata/by-key/artist").ok();
+        let album = self.mpv.get_property("metadata/by-key/album").ok();
+        let title = self.mpv.get_property("metadata/by-key/title").ok();
+        let track = self.mpv.get_property("metadata/by-key/track").ok();
+
+        let metadata = FileMetadata {
+            artist,
+            album,
+            title,
+            track
+        };
+
+        let file_info = FileInfo {
+            filename,
+            metadata
+        };
+
+        Some(MpvEvent::FileLoaded(file_info))
+    }
+
+    fn get_property_event(&self, prop_id: u64, prop: Property) -> Option<MpvEvent> {
+        logging::info!(self.logger, "Property changed: {prop_id}");
+        match prop_id {
+            1 => Some(self.convert_pause_prop(prop.data().unwrap())),
+            _ => None
+        }
+    }
+
+    fn convert_pause_prop(&self, pause: bool) -> MpvEvent {
+        match pause {
+            false => MpvEvent::Play,
+            true => MpvEvent::Pause
+        }
+    }
+
+    fn get_seek_event(&self) -> Option<MpvEvent> {
+        let remaining_time = self.mpv.get_property("time-remaining").unwrap_or_else(|_| {
+            logging::warning!(self.logger, "Failed retrieving remaing-time.");
+            logging::warning!(self.logger, "This usually happens seeking into file end. Possibly mpv bug?");
+            logging::warning!(self.logger, "Defaulting to 0.");
+            0
+        });
+
+        Some(MpvEvent::Seek(remaining_time))
+    }
+
+    fn get_toggle_event(&self, message: ClientMessage) -> Option<MpvEvent> {
+        let command = message.args().join(" ");
+        logging::info!(self.logger, "Client message: {command}");
+        
+        if command.starts_with("key-binding toggle-rpc d-") {
+            return Some(MpvEvent::Toggle)
+        }
+        else {
+            None
+        }
+    }
+}

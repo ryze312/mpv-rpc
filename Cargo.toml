@@ -9,6 +9,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 mpv-client = "0.4.1"
+discord-rich-presence="0.2.3"
 
 [profile.release-full]
 inherits = "release"

@@ -1,25 +1,21 @@
-use std::rc::Rc;
-
 use mpv_client::mpv_handle;
 
-mod mpv_event_handler;
 mod logging;
-mod basic_listener; // For testing purposes
+mod mpv_event_queue;
+mod discord_client;
+mod plugin;
+
+use plugin::RPCPlugin;
+
+const DISCORD_APPID: &str = "1071519995588264016";
 
 #[no_mangle]
 fn mpv_open_cplugin(handle: *mut mpv_handle) -> std::os::raw::c_int {
-    let logger = Rc::new(logging::Logger::from_env());
-
-    let listener = Box::new(basic_listener::MpvListener::new(Rc::clone(&logger)));
-    let result = mpv_event_handler::MpvEventHandler::from_ptr(handle, listener, Rc::clone(&logger));
-    let client = match result {
-        Ok(v) => v,
-        Err(e) => {
-            logging::error!(logger, "Error initializing event_handling: {e}");
-            return -1;
-        }
+    let plugin = match RPCPlugin::new(handle, DISCORD_APPID) {
+        Ok(plugin) => plugin,
+        Err(_) => return -1
     };
 
-    client.run();
+    plugin.run();
     return 0;
 }
