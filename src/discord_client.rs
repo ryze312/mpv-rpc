@@ -120,6 +120,11 @@ impl DiscordClient {
         if let Some(album) = &metadata.album {
             state += &format!(" on {album}");
         }
+
+        if state.is_empty() {
+            state = String::from("File");
+        }
+
         utils::truncate_string_fmt(&mut state, MAX_STR_LEN);
         state
     }
