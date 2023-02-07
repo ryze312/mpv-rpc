@@ -65,12 +65,22 @@ impl Config {
     }
 
     fn get_config_path() -> String {
-        let mpv_home = env::var("MPV_HOME").or(
-            env::var("HOME").and_then(|home| Ok(home + "/.config/mpv/")).or(
-                env::var("XDG_CONFIG_HOME").and_then(|home| Ok(home + "/.mpv/"))
-            )
-        ).unwrap_or("/etc/mpv/".to_string());
+        Config::get_mpv_home() + "rpc.json"
+    }
 
-        return mpv_home + "rpc.json"
+    fn get_mpv_home() -> String {
+        if let Ok(home) = env::var("MPV_HOME") {
+            return home;
+        }
+
+        if let Ok(home) = env::var("HOME") {
+            return home + "/.config/mpv/";
+        }
+
+        if let Ok(home) = env::var("XDG_CONFIG_HOME") {
+            return home + "/.mpv/";
+        }
+
+        "/etc/mpv/".to_owned()
     }
 }
