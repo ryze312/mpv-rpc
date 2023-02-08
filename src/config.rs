@@ -73,12 +73,12 @@ impl Config {
             return home;
         }
 
-        if let Ok(home) = env::var("HOME") {
-            return home + "/.config/mpv/";
+        if let Ok(home) = env::var("XDG_CONFIG_HOME") {
+            return home + "/mpv/";
         }
 
-        if let Ok(home) = env::var("XDG_CONFIG_HOME") {
-            return home + "/.mpv/";
+        if let Ok(home) = env::var("HOME") {
+            return home + "/.config/mpv/";
         }
 
         "/etc/mpv/".to_owned()
