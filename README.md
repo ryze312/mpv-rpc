@@ -20,7 +20,7 @@
 - Simple installation configuration using JSON
 - Ability to toggle activity using keybinding (default - D)
 - Displays current file name and timestamps
-- Displays track metadata (artist, title, album)
+- Displays track metadata (artist, title, album, track number)
 - Displays cover art from MusicBrainz archive
 - Rusty! 🦀 
 
