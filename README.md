@@ -1,4 +1,4 @@
-<center>
+<div align="center">
 
 <img align="center" src="./img/mpv_logo.png">
 
@@ -14,7 +14,7 @@
 
 ![Rich presence](./img/rich_presence.png)
 
-</center>
+</div>
 
 # Features
 - Simple installation configuration using JSON
@@ -39,6 +39,10 @@
 All issues and pull requests are welcome! Feel free to open an issue if you've got an idea or a problem. You can open a pull request if you are able to implement it yourself.
 
 ---
-
-<center><sub><strong>Made with ponies and love!</strong></sub></center>
-<center><sub><strong>GNU GPL © Ryze 2023</strong></sub></center>
+<p align="center">
+<sub><strong>
+    Made with ponies and love!
+    <br/>
+    GNU GPL © Ryze 2023
+</strong></sub>
+</p>
