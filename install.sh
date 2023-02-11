@@ -16,5 +16,5 @@ cp ./config/rpc.json "$mpv_home"
 echo "Done!"
 
 echo -n "Adding keybinding entry to input.conf..."
-echo 'D script-binding "libmpv_rpc/toggle-rpc"' > "$mpv_home/input.conf"
+echo 'D script-binding "libmpv_rpc/toggle-rpc"' >> "$mpv_home/input.conf"
 echo "Done!"
