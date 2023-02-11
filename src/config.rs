@@ -26,13 +26,6 @@ const fn cover_art_default() -> bool {
 }
 
 impl Config {
-    pub fn default() -> Self {
-        Self {
-            active: active_default(),
-            cover_art: cover_art_default()
-        }
-    }
-
     pub fn from_config_file(logger: &Logger) -> Self {
         let path = Config::get_config_path();
         logging::info!(logger, "Config path {path}");
@@ -82,5 +75,14 @@ impl Config {
         }
 
         "/etc/mpv/".to_owned()
+    }
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            active: active_default(),
+            cover_art: cover_art_default()
+        }
     }
 }
