@@ -157,7 +157,7 @@ impl DiscordClient {
             return ("logo".to_string(), "mpv".to_string())
         }
 
-        let cover_art_url = music_brainz::get_cover_art_url(&metadata.title, &metadata.album, &metadata.artist);
+        let cover_art_url = music_brainz::get_cover_art_url(&metadata.title, &metadata.album, &metadata.artist, &metadata.album_artist);
         let large_image = match cover_art_url {
             Some(url) => url,
             None => "logo".to_string()

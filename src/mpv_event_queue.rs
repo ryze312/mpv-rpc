@@ -78,12 +78,14 @@ impl MpvEventQueue {
     fn get_file_info_event(&self) -> Option<MpvEvent> {
         let filename = self.mpv.get_property("filename").unwrap();
         let artist = self.mpv.get_property("metadata/by-key/artist").ok();
+        let album_artist = self.mpv.get_property("metadata/by-key/album_artist").ok();
         let album = self.mpv.get_property("metadata/by-key/album").ok();
         let title = self.mpv.get_property("metadata/by-key/title").ok();
         let track = self.mpv.get_property("metadata/by-key/track").ok();
 
         let metadata = FileMetadata {
             artist,
+            album_artist,
             album,
             title,
             track

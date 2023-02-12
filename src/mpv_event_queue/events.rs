@@ -5,6 +5,7 @@ pub struct FileInfo {
 
 pub struct FileMetadata {
     pub artist: Option<String>,
+    pub album_artist: Option<String>,
     pub album: Option<String>,
     pub title: Option<String>,
     pub track: Option<String>
