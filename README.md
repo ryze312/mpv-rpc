@@ -24,7 +24,8 @@
 - Displays cover art from MusicBrainz archive
 - Rusty! 🦀 
 
-# Installation 
+# Installation
+*Only Linux is supported at the moment, see MPV docs, regarding C plugins*
 1. Download [latest release](https://github.com/ryze312/mpv-rpc/releases/latest) and unzip it
 2. Run the installer script
 3. Keybindings can be changed in input.conf
