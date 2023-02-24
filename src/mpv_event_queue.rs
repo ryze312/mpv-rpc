@@ -41,7 +41,7 @@ impl MpvEventQueue {
     }
 
     pub fn next_event(&mut self) -> Option<MpvEvent> {
-        let event = self.mpv.wait_event(0.0);
+        let event = self.mpv.wait_event(-1.0);
         let mpv_event = self.convert_event(event);
         mpv_event
     }
