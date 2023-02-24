@@ -13,9 +13,11 @@ echo -n "Copying script..."
 cp ./bin/libmpv_rpc.so "$scripts_dir"
 echo "Done!"
 
-echo -n "Copying default config..."
-cp ./config/rpc.json "$mpv_home"
-echo "Done!"
+if [ ! -f "$mpv_home/rpc.json" ]; then
+    echo -n "Copying default config..."
+    cp ./config/rpc.json "$mpv_home"
+    echo "Done!"
+fi
 
 if ! grep -q "$script_binding" "$mpv_home/input.conf"; then
     echo -n "Adding keybinding entry to input.conf..."
