@@ -48,10 +48,7 @@ impl RPCPlugin {
     }
 
     fn handle_event(&mut self, event: MpvEvent) -> bool {
-        let exit = match event {
-            MpvEvent::Exit => true,
-            _ => false
-        };
+        let exit = matches!(event, MpvEvent::Exit);
 
         if let Err(e) = self.discord.handle_event(event) {
             logging::error!(self.logger, "Failed to handle event: {e}");

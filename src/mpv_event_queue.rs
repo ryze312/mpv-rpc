@@ -25,7 +25,7 @@ impl MpvEventQueue {
         Ok(new_self)
     }
 
-    pub fn from_ptr<'a>(handle: *mut mpv_handle, logger: Rc<Logger>) -> Result<Self, &'static str> {
+    pub fn from_ptr(handle: *mut mpv_handle, logger: Rc<Logger>) -> Result<Self, &'static str> {
         MpvEventQueue::new(Handle::from_ptr(handle), logger)
     }
 
@@ -42,8 +42,7 @@ impl MpvEventQueue {
 
     pub fn next_event(&mut self) -> Option<MpvEvent> {
         let event = self.mpv.wait_event(-1.0);
-        let mpv_event = self.convert_event(event);
-        mpv_event
+        self.convert_event(event)
     }
 
     pub fn handle_request(&self, request: MpvRequest) -> Result<(), &'static str> {

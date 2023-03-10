@@ -22,5 +22,5 @@ fn mpv_open_cplugin(handle: *mut mpv_handle) -> std::os::raw::c_int {
     };
 
     plugin.run();
-    return 0;
+    0
 }

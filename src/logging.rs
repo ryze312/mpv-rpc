@@ -49,19 +49,19 @@ impl Logger {
 
     pub fn info(&self, message: &str) {
         if self.log_level >= LogLevel::Info {
-            println!("[mpv-rpc (INFO)] {}", message);
+            println!("[mpv-rpc (INFO)] {message}");
         }
     }
 
     pub fn warning(&self, message: &str) {
         if self.log_level >= LogLevel::Warn {
-            println!("[mpv-rpc (WARN)] {}", message);
+            println!("[mpv-rpc (WARN)] {message}");
         }
     }
 
     pub fn error(&self, message: &str) {
         if self.log_level >= LogLevel::Error {
-            println!("[mpv-rpc (ERROR)] {}", message);
+            println!("[mpv-rpc (ERROR)] {message}");
         }
     }
 }

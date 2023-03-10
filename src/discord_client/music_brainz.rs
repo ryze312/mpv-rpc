@@ -17,7 +17,7 @@ fn get_track_cover_art(artist: &Option<String>, title: &Option<String>) -> Optio
     if let Some(ref artist) = artist {
         // Some artist fields might contain + characters
         // Pointing at multiple artists
-        for part in artist.split("+") {
+        for part in artist.split('+') {
             builder.and().artist(part);
         }
     }
@@ -33,7 +33,7 @@ fn get_album_cover_art(album_artist: &Option<String>,  album: &Option<String>) -
     if let Some(ref album_artist) = album_artist {
         // Some artist fields might contain + characters
         // Pointing at multiple artists
-        for part in album_artist.split("+") {
+        for part in album_artist.split('+') {
             builder.and().artist(part);
         }
     }

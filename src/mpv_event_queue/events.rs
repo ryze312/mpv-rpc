@@ -30,5 +30,5 @@ pub trait MpvEventHandler {
 }
 
 pub trait MpvRequester {
-    fn next_request<'a>(&mut self) -> Option<MpvRequest>;
+    fn next_request(&mut self) -> Option<MpvRequest>;
 }
