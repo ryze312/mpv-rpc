@@ -15,13 +15,13 @@ pub struct MpvEventQueue {
 }
 
 impl MpvEventQueue {
-    pub fn new(mpv: Handle,logger: Rc<Logger>) -> Result<Self, &'static str>  {        
+    pub fn new(mpv: Handle,logger: Rc<Logger>) -> Result<Self, &'static str>  {
         let new_self = Self {
             mpv,
             logger,
         };
-        
-        new_self.initialize()?;        
+
+        new_self.initialize()?;
         Ok(new_self)
     }
 
@@ -50,7 +50,7 @@ impl MpvEventQueue {
             MpvRequest::OSDMessage(message) => self.display_osd_message(message)
         }
     }
-    
+
     pub fn display_osd_message(&self, message: &str) -> Result<(), &'static str> {
         match self.mpv.osd_message(message, Duration::from_secs(1)) {
             Ok(()) => Ok(()),
@@ -111,7 +111,7 @@ impl MpvEventQueue {
         let time = self.get_remaining_time();
         match pause {
             false => Some(MpvEvent::Play(time)),
-            true => Some(MpvEvent::Pause(time))
+            true => Some(MpvEvent::Pause)
         }
     }
 
@@ -133,7 +133,7 @@ impl MpvEventQueue {
     fn get_toggle_event(&self, message: ClientMessage) -> Option<MpvEvent> {
         let command = message.args().join(" ");
         logging::info!(self.logger, "Client message: {command}");
-        
+
         if command.starts_with("key-binding toggle-rpc d-") {
             Some(MpvEvent::Toggle)
         }

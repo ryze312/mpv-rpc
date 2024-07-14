@@ -47,7 +47,7 @@ fn get_cover_art_from_query(query: String) -> Option<String> {
         Err(_) => return None
     };
 
-    let release = match result.entities.get(0) {
+    let release = match result.entities.first() {
         Some(group) => group,
         None => return None
     };

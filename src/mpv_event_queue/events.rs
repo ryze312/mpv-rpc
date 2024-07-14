@@ -17,7 +17,7 @@ pub enum MpvEvent {
     Exit,
     FileLoaded(FileInfo),
     Play(i64),
-    Pause(i64),
+    Pause,
     Seek(i64)
 }
 

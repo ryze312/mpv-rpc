@@ -265,7 +265,7 @@ impl MpvEventHandler for DiscordClient {
             MpvEvent::FileLoaded(file_info) => self.set_presence(file_info),
             MpvEvent::Seek(remaining_time) => self.set_timestamps(remaining_time),
             MpvEvent::Play(remaining_time) => self.set_timestamps(remaining_time),
-            MpvEvent::Pause(_) => self.clear_timestamps(),
+            MpvEvent::Pause => self.clear_timestamps(),
             MpvEvent::Buffering => self.clear_timestamps(),
             MpvEvent::Toggle => self.toggle_activity(),
             MpvEvent::Exit => self.close(),

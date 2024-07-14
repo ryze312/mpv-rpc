@@ -1,6 +1,8 @@
 use std::env;
 
 pub mod macros;
+
+#[allow(unused_imports)]
 pub use macros::{error, warning, info};
 
 #[allow(dead_code)]
@@ -40,7 +42,7 @@ impl Logger {
     pub fn from_env() -> Self {
         let level = env::var("MPV_RPC_LOG").unwrap_or_default();
         let level: u32 = level.parse().unwrap_or(LogLevel::Error as u32);
-        
+
         let log_level = LogLevel::from(level);
         Self {
             log_level
