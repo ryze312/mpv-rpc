@@ -16,6 +16,11 @@
 
 </div>
 
+# Notice
+The plugin is no longer maintained, as I'm not interested in it anymore. Since I've made it, there have been applications developed by other people that provide the same functionality. Consider using them instead!
+- [mprisence](https://github.com/lazykern/mprisence)
+- [music-discord-rpc](https://github.com/patryk-ku/music-discord-rpc)
+
 # Features
 - Simple installation configuration using JSON
 - Ability to toggle activity using keybinding (default - D)
